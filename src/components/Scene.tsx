@@ -1,5 +1,5 @@
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
-import { Environment, Lightformer, Preload, useGLTF } from '@react-three/drei'
+import { Environment, Lightformer, useGLTF } from '@react-three/drei'
 import { Bloom, EffectComposer } from '@react-three/postprocessing'
 import { useEffect, useMemo, useRef } from 'react'
 import * as THREE from 'three'
@@ -14,6 +14,9 @@ type MotionData = { points: Vec[]; angles: Vec[]; cameraViews: CameraView[] }
 
 type RenderMaterial = THREE.Material & { emissive?: THREE.Color; emissiveIntensity?: number; wireframe?: boolean }
 type MaterialPair = { solid: RenderMaterial; wireframe: RenderMaterial; baseOpacity: number }
+
+const MODEL_URL = '/model/carro.glb'
+const DRACO_URL = '/draco/' // self-hosted decoder: no round trip to gstatic
 
 const carroMotion = carroData as unknown as MotionData
 
@@ -41,7 +44,7 @@ function disposeAll(materials: THREE.Material[]) {
 }
 
 function Carro({ reduced }: { reduced: boolean }) {
-  const { scene } = useGLTF('/model/carro.glb')
+  const { scene } = useGLTF(MODEL_URL, DRACO_URL)
   const carro = useMemo(() => scene.clone(), [scene])
   const trail = useMemo(() => scene.clone(), [scene])
   const root = useRef<Group>(null)
@@ -229,7 +232,7 @@ export default function Scene() {
   return (
     <Canvas
       camera={{ position: [3.1, -0.45, -0.18], fov: 45, near: 0.05, far: 60 }}
-      dpr={[1, 1.75]}
+      dpr={[1, 1.5]}
       frameloop={finished ? 'never' : 'always'}
       gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }}
       shadows
@@ -240,24 +243,23 @@ export default function Scene() {
         position={[4, 5, 3]}
         intensity={3}
         castShadow
-        shadow-mapSize={[2048, 2048]}
+        shadow-mapSize={[1024, 1024]}
         shadow-bias={-0.0004}
         shadow-normalBias={0.02}
       />
       <directionalLight position={[-3, -2, -4]} intensity={1.2} />
-      <Environment resolution={256} environmentIntensity={0.55}>
+      <Environment resolution={128} environmentIntensity={0.55}>
         <Lightformer form="rect" intensity={3} position={[0, 5, 0]} rotation-x={Math.PI / 2} scale={[8, 8, 1]} />
         <Lightformer form="rect" intensity={2} position={[-5, 1, -2]} rotation-y={Math.PI / 2} scale={[8, 3, 1]} />
         <Lightformer form="ring" intensity={2.4} color="#bfe9ff" position={[4, 0, 4]} scale={4} />
       </Environment>
       <Carro reduced={reduced} />
       <CameraMotion />
-      <EffectComposer multisampling={4}>
+      <EffectComposer multisampling={0}>
         <Bloom intensity={1.15} luminanceSmoothing={0.82} luminanceThreshold={0.45} mipmapBlur radius={0.72} />
       </EffectComposer>
-      <Preload all />
     </Canvas>
   )
 }
 
-useGLTF.preload('/model/carro.glb')
+useGLTF.preload(MODEL_URL, DRACO_URL)
