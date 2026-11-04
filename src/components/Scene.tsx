@@ -4,9 +4,8 @@ import { Bloom, EffectComposer } from '@react-three/postprocessing'
 import { useEffect, useMemo, useRef } from 'react'
 import * as THREE from 'three'
 import type { Group } from 'three'
-import watchData from '../data/watch-points.json'
-import vienData from '../data/vien-points.json'
-import { clamp01, ease, pointerStore, prefersReducedMotion, scrollStore, smooth, vienProgress, watchProgress } from '../store'
+import carroData from '../data/carro-points.json'
+import { clamp01, carroProgress, ease, pointerStore, prefersReducedMotion, scrollStore, smooth } from '../store'
 import { useScrollAbove } from '../hooks'
 
 type Vec = { x: number; y: number; z: number }
@@ -16,8 +15,7 @@ type MotionData = { points: Vec[]; angles: Vec[]; cameraViews: CameraView[] }
 type RenderMaterial = THREE.Material & { emissive?: THREE.Color; emissiveIntensity?: number; wireframe?: boolean }
 type MaterialPair = { solid: RenderMaterial; wireframe: RenderMaterial; baseOpacity: number }
 
-const watchMotion = watchData as unknown as MotionData
-const vienMotion = vienData as unknown as MotionData
+const carroMotion = carroData as unknown as MotionData
 
 /** Quintic smootherstep between keyframes. */
 function sampleKeyframes<T>(keyframes: T[], progress: number, mix: (from: T, to: T, t: number) => T) {
@@ -42,9 +40,9 @@ function disposeAll(materials: THREE.Material[]) {
   materials.forEach((material) => material.dispose())
 }
 
-function Watch({ reduced }: { reduced: boolean }) {
-  const { scene } = useGLTF('/model/watch.glb')
-  const watch = useMemo(() => scene.clone(), [scene])
+function Carro({ reduced }: { reduced: boolean }) {
+  const { scene } = useGLTF('/model/carro.glb')
+  const carro = useMemo(() => scene.clone(), [scene])
   const trail = useMemo(() => scene.clone(), [scene])
   const root = useRef<Group>(null)
   const group = useRef<Group>(null)
@@ -65,7 +63,7 @@ function Watch({ reduced }: { reduced: boolean }) {
     wireMeshes.current = []
 
     const meshes: THREE.Mesh[] = []
-    watch.traverse((object) => {
+    carro.traverse((object) => {
       if ((object as THREE.Mesh).isMesh) meshes.push(object as THREE.Mesh)
     })
 
@@ -119,17 +117,16 @@ function Watch({ reduced }: { reduced: boolean }) {
       added.forEach((mesh) => mesh.parent?.remove(mesh))
       disposeAll(created)
     }
-  }, [watch, trail])
+  }, [carro, trail])
 
   useFrame((_, rawDelta) => {
     const delta = Math.min(rawDelta, 0.1)
     const p = scrollStore.value
-    const wp = watchProgress(p)
-    if (root.current) root.current.visible = p < 0.5
+    const cp = carroProgress(p)
 
-    if (!group.current || p >= 0.5) return
-    const position = sampleKeyframes(watchMotion.points, wp, mixVec)
-    const rotation = sampleKeyframes(watchMotion.angles, wp, mixVec)
+    if (!group.current) return
+    const position = sampleKeyframes(carroMotion.points, cp, mixVec)
+    const rotation = sampleKeyframes(carroMotion.angles, cp, mixVec)
     const px = reduced ? 0 : pointerStore.x
     const py = reduced ? 0 : pointerStore.y
 
@@ -144,7 +141,7 @@ function Watch({ reduced }: { reduced: boolean }) {
     group.current.rotation.y = THREE.MathUtils.damp(group.current.rotation.y, desiredRotation.y, 4, delta)
     group.current.rotation.z = THREE.MathUtils.damp(group.current.rotation.z, desiredRotation.z, 4, delta)
 
-    // Ghost trail that only shows while the watch is moving.
+    // Ghost trail that only shows while the model is moving.
     if (trailGroup.current) {
       const frameScale = delta > 0 ? delta * 60 : 1
       const movement = group.current.position.distanceTo(previousPosition) / frameScale
@@ -165,13 +162,13 @@ function Watch({ reduced }: { reduced: boolean }) {
     }
 
     // Solid -> wireframe -> solid choreography (peaks on camera view 5).
-    const segments = Math.max(watchMotion.cameraViews.length - 1, 1)
+    const segments = Math.max(carroMotion.cameraViews.length - 1, 1)
     const viewFive = 4 / segments
     const viewSix = 5 / segments
     const wireAmount =
-      wp < viewFive
-        ? smooth(wp, viewFive - 1.4 / segments, viewFive)
-        : 1 - smooth(wp, viewFive, viewSix + 0.15 / segments)
+      cp < viewFive
+        ? smooth(cp, viewFive - 1.4 / segments, viewFive)
+        : 1 - smooth(cp, viewFive, viewSix + 0.15 / segments)
 
     const showWire = wireAmount > 0.001
     wireMeshes.current.forEach((mesh) => (mesh.visible = showWire))
@@ -188,80 +185,7 @@ function Watch({ reduced }: { reduced: boolean }) {
         <primitive object={trail} />
       </group>
       <group ref={group}>
-        <primitive object={watch} />
-      </group>
-    </group>
-  )
-}
-
-function Vien({ reduced }: { reduced: boolean }) {
-  const { scene } = useGLTF('/model/vien.glb')
-  const vien = useMemo(() => scene.clone(), [scene])
-  const wireVien = useMemo(() => scene.clone(), [scene])
-  const root = useRef<Group>(null)
-  const group = useRef<Group>(null)
-  const wireMaterials = useRef<RenderMaterial[]>([])
-  const desiredRotation = useMemo(() => new THREE.Euler(), [])
-
-  const scale = useMemo(() => {
-    vien.updateMatrixWorld(true)
-    const box = new THREE.Box3().setFromObject(vien)
-    const size = box.getSize(new THREE.Vector3())
-    const center = box.getCenter(new THREE.Vector3())
-    vien.position.sub(center)
-    wireVien.position.copy(vien.position)
-    return 2.4 / Math.max(size.x, size.y, size.z)
-  }, [vien, wireVien])
-
-  useEffect(() => {
-    const created: THREE.Material[] = []
-    wireMaterials.current = []
-    wireVien.traverse((object) => {
-      const mesh = object as THREE.Mesh
-      if (!mesh.isMesh) return
-      const wires = toArray(mesh.material).map((source) => {
-        const material = source.clone() as RenderMaterial
-        material.wireframe = true
-        material.transparent = true
-        material.depthWrite = false
-        if (material.emissive) {
-          material.emissive = new THREE.Color('#aeeeff')
-          material.emissiveIntensity = 3
-        }
-        return material
-      })
-      created.push(...wires)
-      mesh.material = Array.isArray(mesh.material) ? wires : wires[0]
-      mesh.renderOrder = 2
-      wireMaterials.current.push(...wires)
-    })
-    return () => disposeAll(created)
-  }, [wireVien])
-
-  useFrame((_, rawDelta) => {
-    const delta = Math.min(rawDelta, 0.1)
-    const p = scrollStore.value
-    if (root.current) root.current.visible = p >= 0.5
-    if (!group.current || p < 0.5) return
-    const vp = vienProgress(p)
-    const px = reduced ? 0 : pointerStore.x
-    const py = reduced ? 0 : pointerStore.y
-
-    desiredRotation.set(py * 0.02, Math.PI / 2 + px * 0.03, Math.PI / 2)
-    group.current.rotation.x = THREE.MathUtils.damp(group.current.rotation.x, desiredRotation.x, 3.5, delta)
-    group.current.rotation.y = THREE.MathUtils.damp(group.current.rotation.y, desiredRotation.y, 3.5, delta)
-    group.current.rotation.z = THREE.MathUtils.damp(group.current.rotation.z, desiredRotation.z, 3.5, delta)
-    group.current.position.y = THREE.MathUtils.damp(group.current.position.y, Math.sin(vp * Math.PI) * 0.025, 2.5, delta)
-
-    const opacity = 0.52 + Math.sin(vp * Math.PI) * 0.18
-    wireMaterials.current.forEach((material) => (material.opacity = opacity))
-  })
-
-  return (
-    <group ref={root} visible={false}>
-      <group ref={group} scale={scale} rotation={[0, Math.PI / 2, Math.PI / 2]}>
-        <primitive object={vien} />
-        <primitive object={wireVien} />
+        <primitive object={carro} />
       </group>
     </group>
   )
@@ -276,11 +200,9 @@ function CameraMotion() {
   useFrame((_, rawDelta) => {
     const delta = Math.min(rawDelta, 0.1)
     const p = scrollStore.value
-    const watchPhase = p < 0.5
-    const motion = watchPhase ? watchMotion : vienMotion
-    const progress = watchPhase ? watchProgress(p) : vienProgress(p)
+    const progress = carroProgress(p)
 
-    const view = sampleKeyframes(motion.cameraViews, progress, (from, to, t) => ({
+    const view = sampleKeyframes(carroMotion.cameraViews, progress, (from, to, t) => ({
       position: mixVec(from.position, to.position, t),
       target: mixVec(from.target, to.target, t),
       fov: THREE.MathUtils.lerp(from.fov, to.fov, t),
@@ -328,8 +250,7 @@ export default function Scene() {
         <Lightformer form="rect" intensity={2} position={[-5, 1, -2]} rotation-y={Math.PI / 2} scale={[8, 3, 1]} />
         <Lightformer form="ring" intensity={2.4} color="#bfe9ff" position={[4, 0, 4]} scale={4} />
       </Environment>
-      <Watch reduced={reduced} />
-      <Vien reduced={reduced} />
+      <Carro reduced={reduced} />
       <CameraMotion />
       <EffectComposer multisampling={4}>
         <Bloom intensity={1.15} luminanceSmoothing={0.82} luminanceThreshold={0.45} mipmapBlur radius={0.72} />
@@ -339,5 +260,4 @@ export default function Scene() {
   )
 }
 
-useGLTF.preload('/model/watch.glb')
-useGLTF.preload('/model/vien.glb')
+useGLTF.preload('/model/carro.glb')

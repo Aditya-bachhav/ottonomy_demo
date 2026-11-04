@@ -31,9 +31,8 @@ export const clamp01 = (value: number) => THREE.MathUtils.clamp(value, 0, 1)
 /** Frame-rate independent exponential smoothing factor. */
 export const ease = (lambda: number, delta: number) => 1 - Math.exp(-lambda * delta)
 
-/** Scroll progress of the whole cinematic stage -> per-model progress. */
-export const watchProgress = (p: number) => clamp01(p * 2)
-export const vienProgress = (p: number) => clamp01((p - 0.5) * 2)
+/** Scroll progress of the whole cinematic stage -> model progress. */
+export const carroProgress = (p: number) => clamp01(p)
 
 export const prefersReducedMotion = () =>
   typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches

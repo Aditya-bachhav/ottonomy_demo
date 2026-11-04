@@ -23,8 +23,8 @@ export function Navbar() {
             <img src="/neuron.webp" alt="" width="240" height="160" decoding="async" />
           </span>
         </div>
-        <a className="strim-navbar__title" href="#home" aria-label="StimCardio — back to top">
-          StimCardio
+        <a className="strim-navbar__title" href="#home" aria-label="Ottonomy — back to top">
+          Ottonomy
         </a>
         <div className="strim-navbar__image strim-navbar__image--right" aria-hidden="true">
           <span>
@@ -46,30 +46,30 @@ const siteCards = [
   {
     id: 'about-us',
     number: '01',
-    label: 'About',
-    title: 'A new signal for everyday care',
-    copy: 'StimCardio is building a non-invasive, wearable neuromodulation platform that brings personalized therapy into daily life.',
+    label: 'Platform',
+    title: 'Autonomy that moves work forward',
+    copy: 'Ottonomy builds autonomous robots that move goods safely and seamlessly through the places people work, shop, and receive care.',
   },
   {
     id: 'technology',
     number: '02',
-    label: 'Technology',
-    title: 'Sensing that adapts to you',
-    copy: 'Continuous physiological sensing and intelligent therapy work together to create a more responsive path to rhythm care.',
+    label: 'Healthcare',
+    title: 'Critical deliveries, handled with care',
+    copy: 'Move medicines, lab samples, and essential materials across hospitals and care environments with less friction.',
   },
   {
-    id: 'clinical-research',
+    id: 'commerce',
     number: '03',
-    label: 'Clinical research',
-    title: 'Evidence, built step by step',
-    copy: 'Our structured clinical program evaluates feasibility, safety, usability, physiological effects, and clinical efficacy.',
+    label: 'Commerce',
+    title: 'The last mile, made more capable',
+    copy: 'Support curbside and retail delivery with an autonomous fleet designed for dependable handoffs and smoother operations.',
   },
   {
-    id: 'news',
+    id: 'enterprise',
     number: '04',
-    label: 'News',
-    title: 'Follow the next chapter',
-    copy: 'Explore the latest research, milestones, and thinking from StimCardio Medical as the platform develops.',
+    label: 'Enterprise',
+    title: 'One fleet, many environments',
+    copy: 'Connect campuses, facilities, and indoor routes through a flexible delivery layer built for modern operations.',
   },
 ]
 
@@ -87,16 +87,16 @@ export function PostModelLayout() {
     <section className="site-layout" id="about" aria-labelledby="site-layout-title">
       <div className="site-layout-head">
         <span className="site-layout-index">01 — 04</span>
-        <span className="site-layout-label">StimCardio Medical</span>
+        <span className="site-layout-label">Ottonomy Autonomous Delivery</span>
       </div>
       <div className="site-layout-intro reveal-group" ref={intro}>
-        <p className="site-layout-kicker reveal-fade">A different rhythm of care</p>
+        <p className="site-layout-kicker reveal-fade">The future of delivery is autonomous</p>
         <h2 id="site-layout-title">
           <span className="line">
-            <span>Designed for the moments</span>
+            <span>Move what matters</span>
           </span>
           <span className="line">
-            <span>between medicine and life.</span>
+            <span>with less friction.</span>
           </span>
         </h2>
       </div>
@@ -131,35 +131,35 @@ export function SiteFooter() {
   return (
     <footer className="site-footer" id="contact">
       <div className="site-footer__top">
-        <span className="site-footer__eyebrow">StimCardio Medical</span>
-        <p>Building a more responsive future for atrial fibrillation care.</p>
+        <span className="site-footer__eyebrow">Ottonomy®</span>
+        <p>Autonomous delivery for the places that keep the world moving.</p>
       </div>
       <div className="site-footer__grid">
         <div>
           <span className="site-footer__label">Explore</span>
-          <a href="#about">About</a>
-          <a href="#technology">Technology</a>
-          <a href="#clinical-research">Clinical Research</a>
-          <a href="#news">News</a>
+          <a href="#about">Platform</a>
+          <a href="#about-us">Healthcare</a>
+          <a href="#technology">Commerce</a>
+          <a href="#enterprise">Enterprise</a>
         </div>
         <div id="careers">
           <span className="site-footer__label">Connect</span>
-          <a href="mailto:hello@stimcardio.com">Contact Us ↗</a>
-          <a href="mailto:hello@stimcardio.com?subject=Careers">Careers ↗</a>
-          <a href="https://www.linkedin.com/company/stimcardio/" target="_blank" rel="noreferrer noopener">
+          <a href="mailto:hello@ottonomy.io">Contact Us ↗</a>
+          <a href="mailto:hello@ottonomy.io?subject=Careers">Careers ↗</a>
+          <a href="https://www.linkedin.com/company/ottonomy/" target="_blank" rel="noreferrer noopener">
             LinkedIn ↗
           </a>
         </div>
         <div className="site-footer__mark" aria-hidden="true">
-          StimCardio
+          Ottonomy
         </div>
       </div>
       <div className="site-footer__bottom">
-        <span>© {new Date().getFullYear()} StimCardio Medical. All rights reserved.</span>
+        <span>© {new Date().getFullYear()} Ottonomy®. All rights reserved.</span>
         <button type="button" className="site-footer__top-link" onClick={() => scrollToTarget(0)}>
           Back to top ↑
         </button>
-        <span>Investigational device. Not approved for sale.</span>
+        <span>Demo experience inspired by autonomous delivery.</span>
       </div>
     </footer>
   )

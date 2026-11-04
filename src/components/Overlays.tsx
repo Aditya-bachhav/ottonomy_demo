@@ -1,13 +1,10 @@
 import { useEffect, useLayoutEffect, useRef } from 'react'
 import type { CSSProperties, ElementType, ReactNode } from 'react'
-import watchData from '../data/watch-points.json'
-import vienData from '../data/vien-points.json'
-import { clamp01, scrollStore, smooth, vienProgress, watchProgress } from '../store'
+import carroData from '../data/carro-points.json'
+import { clamp01, carroProgress, scrollStore, smooth } from '../store'
 
-const WATCH_SEGMENT = 1 / Math.max(watchData.cameraViews.length - 1, 1)
-const VIEN_SEGMENT = 1 / Math.max(vienData.cameraViews.length - 1, 1)
+const CARRO_SEGMENT = 1 / Math.max(carroData.cameraViews.length - 1, 1)
 
-type Phase = 'watch' | 'vien'
 type Visibility = { amount: number; blur: number }
 
 /**
@@ -16,15 +13,13 @@ type Visibility = { amount: number; blur: number }
  */
 function ScrollReveal({
   as: Tag = 'section',
-  phase = 'watch',
   className,
   label,
   compute,
   children,
 }: {
-  as?: ElementType
-  phase?: Phase
-  className: string
+as?: ElementType
+className: string
   label?: string
   compute: (progress: number) => Visibility
   children: ReactNode
@@ -35,16 +30,14 @@ function ScrollReveal({
     const node = ref.current
     if (!node) return
     return scrollStore.subscribe((p) => {
-      const local = phase === 'watch' ? watchProgress(p) : vienProgress(p)
-      const inPhase = phase === 'watch' ? p < 0.52 : p > 0.48
-      const { amount, blur } = compute(local)
-      const visible = inPhase && amount > 0.01
+      const { amount, blur } = compute(carroProgress(p))
+      const visible = amount > 0.01
       node.style.opacity = visible ? String(amount) : '0'
       node.style.visibility = visible ? 'visible' : 'hidden'
       node.style.filter = visible && blur > 0.2 ? `blur(${blur.toFixed(2)}px)` : 'none'
       node.setAttribute('aria-hidden', visible ? 'false' : 'true')
     })
-  }, [compute, phase])
+  }, [compute])
 
   return (
     <Tag ref={ref} className={className} aria-label={label} style={{ opacity: 0, visibility: 'hidden' } as CSSProperties}>
@@ -59,25 +52,21 @@ const windowed = (value: number, inStart: number, inEnd: number, outStart?: numb
   return { amount: reveal * fade, blur: (1 - reveal) * 12 + (1 - fade) * 12 }
 }
 
-const L = WATCH_SEGMENT
+const L = CARRO_SEGMENT
 
-const computeMedical = (p: number) => windowed(p, L, L + L * 0.22, L * 1.6 - L * 0.28, L * 1.6)
+const computePlatform = (p: number) => windowed(p, L, L + L * 0.22, L * 1.6 - L * 0.28, L * 1.6)
 const computeStats = (p: number) => windowed(p, L * 1.75, L * 2.05, L * 2.5, L * 2.9)
-const computeClinical = (p: number) => windowed(p, L * 2.85, L * 3.03, L * 3.6, L * 3.95)
+const computeEnterprise = (p: number) => windowed(p, L * 2.85, L * 3.03, L * 3.6, L * 3.95)
 const computeFinal = (p: number) => windowed(p, L * 4.7, L * 4.96)
 const computeNarrative = (p: number) => windowed(p, L * 3.0, L * 3.3, L * 4.65, L * 5.05)
-const computeVien = (p: number) =>
-  windowed(p, VIEN_SEGMENT * 1.65, VIEN_SEGMENT * 1.9, VIEN_SEGMENT * 2.6, VIEN_SEGMENT * 2.85)
-
-export function MedicalCallout() {
+export function OttonomyCallout() {
   return (
-    <ScrollReveal className="medical-callout" compute={computeMedical} label="Wearable neuromodulation platform">
-      <div className="medical-callout-copy">
-        <span className="medical-callout-label">Wearable neuromodulation platform</span>
+    <ScrollReveal className="platform-callout" compute={computePlatform} label="Autonomous delivery platform">
+      <div className="platform-callout-copy">
+        <span className="platform-callout-label">Autonomous delivery platform</span>
         <p>
-          StimCardio Medical is developing a non-invasive, wearable neuromodulation platform that integrates continuous
-          physiological sensing with personalized therapy, designed for use in everyday life, beginning with atrial
-          fibrillation.
+          Ottonomy robots help organizations move medicines, lab samples, retail packages, and critical materials
+          autonomously—curbside, across campuses, and within facilities.
         </p>
       </div>
     </ScrollReveal>
@@ -85,20 +74,19 @@ export function MedicalCallout() {
 }
 
 const statistics = [
-  ['52.5M+', 'People worldwide', 'people'],
-  ['~5×', 'Increased risk of ischemic stroke', 'brain'],
-  ['1 in 3–5', 'Lifetime risk after age 40', 'time'],
-  ['>60%', 'AF recurrence within one year', 'heart'],
-  ['$36B', 'Annual healthcare cost in the U.S.', 'pulse'],
-  ['~500K', 'AF-related hospitalizations each year', 'hospital'],
+  ['4', 'Industries served', 'people'],
+  ['4', 'Types of critical deliveries', 'brain'],
+  ['3', 'Delivery environments', 'time'],
+  ['24/7', 'Designed for continuous operations', 'heart'],
+  ['1', 'Autonomous delivery layer', 'pulse'],
+  ['∞', 'Routes across your operation', 'hospital'],
 ] as const
 
-export function AfibStatistics() {
+export function DeliveryHighlights() {
   return (
-    <ScrollReveal className="afib-statistics" compute={computeStats} label="Atrial Fibrillation by the Numbers">
+    <ScrollReveal className="delivery-highlights" compute={computeStats} label="Autonomous delivery at a glance">
       <h2>
-        Atrial Fibrillation <strong>by the Numbers</strong>
-        <sup>2</sup>
+        Autonomous delivery <strong>at a glance</strong>
       </h2>
       <div className="stats-grid">
         {statistics.map(([value, label, icon]) => (
@@ -115,56 +103,43 @@ export function AfibStatistics() {
   )
 }
 
-export function ClinicalResearchCallout() {
+export function EnterpriseCallout() {
   return (
-    <ScrollReveal className="clinical-callout" compute={computeClinical} label="Clinical research">
-      <span className="clinical-callout-label">Clinical research</span>
-      <h2>Advancing neuromodulation through clinical research</h2>
+    <ScrollReveal className="enterprise-callout" compute={computeEnterprise} label="Delivery across every environment">
+      <span className="callout-label">Built for every environment</span>
+      <h2>From curbside to the center of the campus</h2>
       <p>
-        StimCardio Medical is conducting a structured, multi-stage clinical program to evaluate its non-invasive,
-        wearable neuromodulation platform.
+        Ottonomy’s autonomous robots are designed to connect the last mile with the places where work happens:
+        hospitals, stores, distribution points, and enterprise facilities.
       </p>
       <p>
-        Studies assess feasibility, safety, usability, physiological effects, and clinical efficacy, with atrial
-        fibrillation as the lead indication.
-      </p>
-    </ScrollReveal>
-  )
-}
-
-export function FinalCallout() {
-  return (
-    <ScrollReveal className="final-callout" compute={computeFinal} label="Personalized neuromodulation">
-      <span className="clinical-callout-label">The next signal</span>
-      <h2>Personalized neuromodulation for everyday life</h2>
-      <p>
-        StimCardio is advancing a non-invasive, wearable platform designed to sense each person’s physiology and
-        deliver personalized therapy for the future of atrial fibrillation care.
+        Integrate delivery into existing operations to help teams focus on higher-value work while goods keep moving.
       </p>
     </ScrollReveal>
   )
 }
 
-export function WatchNarrative() {
+export function ReliabilityCallout() {
   return (
-    <ScrollReveal className="watch-narrative" compute={computeNarrative} label="Personalized cardiac sensing">
-      <span className="watch-narrative-label">A closer signal</span>
-      <h2>Every heartbeat carries information.</h2>
+    <ScrollReveal className="final-callout" compute={computeFinal} label="Reliable autonomous delivery">
+      <span className="callout-label">The next handoff</span>
+      <h2>More efficiency. More reliability. Less friction.</h2>
       <p>
-        Continuous sensing helps reveal the rhythms, patterns, and moments that shape each person’s experience of
-        atrial fibrillation.
+        Give every delivery a dependable path with autonomous mobility that scales from a single facility to an entire
+        network of locations.
       </p>
     </ScrollReveal>
   )
 }
 
-export function VienNarrative() {
+export function CarroNarrative() {
   return (
-    <ScrollReveal className="vien-narrative" phase="vien" compute={computeVien} label="A wearable signal">
-      <span className="vien-narrative-label">A wearable signal</span>
+    <ScrollReveal className="carro-narrative" compute={computeNarrative} label="Autonomy in motion">
+      <span className="carro-narrative-label">Autonomy in motion</span>
+      <h2>Every delivery has a destination.</h2>
       <p>
-        Designed to move with the body, Vienna brings sensing and personalized neuromodulation closer to everyday
-        cardiac care.
+        See how a flexible robotic fleet can move through real-world environments and make the final handoff feel
+        effortless.
       </p>
     </ScrollReveal>
   )
@@ -180,7 +155,7 @@ export function BrandMark() {
     if (!node) return
 
     const apply = (p: number) => {
-      const wp = watchProgress(p)
+      const wp = carroProgress(p)
       const move = smooth(wp, L * 0.4, L * 1.15)
       const blurIn = smooth(wp, L * 0.4, L * 0.7)
       const blurOut = smooth(wp, L * 0.7, L * 1.15)
@@ -213,9 +188,9 @@ export function BrandMark() {
   }, [])
 
   return (
-    <h1 className="brand-mark" ref={ref} aria-label="StimCardio">
+    <h1 className="brand-mark" ref={ref} aria-label="Ottonomy">
       <span className="brand-mark-text" aria-hidden="true">
-        StimCardio
+        Ottonomy
       </span>
     </h1>
   )

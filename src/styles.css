@@ -381,7 +381,7 @@ html.lenis body {
   min-height: 100%;
 }
 
-.watch-content {
+.model-content {
   position: relative;
   z-index: 2;
 }
@@ -497,12 +497,11 @@ html.lenis body {
 
 /* Overlays share legibility treatment */
 
-.medical-callout,
-.clinical-callout,
+.platform-callout,
+.enterprise-callout,
 .final-callout,
-.watch-narrative,
-.vien-narrative,
-.afib-statistics {
+.carro-narrative,
+.delivery-highlights {
   position: fixed;
   z-index: 2;
   pointer-events: none;
@@ -510,19 +509,19 @@ html.lenis body {
   will-change: opacity, filter;
 }
 
-.medical-callout {
+.platform-callout {
   right: 5vw;
   bottom: 18vh;
   width: min(34rem, 38vw);
   min-width: 14rem;
 }
 
-.medical-callout-copy {
+.platform-callout-copy {
   padding-left: 1rem;
   border-left: 1px solid rgba(255, 255, 255, 0.32);
 }
 
-.medical-callout-label {
+.platform-callout-label {
   display: block;
   margin-bottom: 0.7rem;
   color: rgba(255, 255, 255, 0.62);
@@ -532,14 +531,14 @@ html.lenis body {
   text-transform: uppercase;
 }
 
-.medical-callout p {
+.platform-callout p {
   margin: 0;
   color: rgba(255, 255, 255, 0.92);
   font-size: clamp(0.9rem, 1.15vw, 1.15rem);
   line-height: 1.45;
 }
 
-.clinical-callout {
+.enterprise-callout {
   top: 20vh;
   right: 7vw;
   width: min(31rem, 34vw);
@@ -551,9 +550,8 @@ html.lenis body {
   width: min(31rem, 34vw);
 }
 
-.clinical-callout-label,
-.watch-narrative-label,
-.vien-narrative-label {
+.callout-label,
+.carro-narrative-label {
   display: block;
   margin-bottom: 1.1rem;
   color: var(--ice-soft);
@@ -562,7 +560,7 @@ html.lenis body {
   text-transform: uppercase;
 }
 
-.clinical-callout h2,
+.enterprise-callout h2,
 .final-callout h2 {
   max-width: 24rem;
   margin: 0 0 1.4rem;
@@ -573,7 +571,7 @@ html.lenis body {
   line-height: 1.05;
 }
 
-.clinical-callout p,
+.enterprise-callout p,
 .final-callout p {
   max-width: 29rem;
   margin: 0 0 0.85rem;
@@ -582,14 +580,14 @@ html.lenis body {
   line-height: 1.5;
 }
 
-.watch-narrative {
+.carro-narrative {
   top: 42vh;
   left: 7vw;
   width: min(22rem, 27vw);
   min-width: 15rem;
 }
 
-.watch-narrative h2 {
+.carro-narrative h2 {
   margin: 0 0 1.1rem;
   color: rgba(255, 255, 255, 0.95);
   font-size: clamp(1.45rem, 2.2vw, 2.35rem);
@@ -598,30 +596,16 @@ html.lenis body {
   line-height: 1.05;
 }
 
-.watch-narrative p {
+.carro-narrative p {
   margin: 0;
   color: rgba(255, 255, 255, 0.72);
   font-size: clamp(0.8rem, 0.95vw, 0.98rem);
   line-height: 1.5;
 }
 
-.vien-narrative {
-  top: 46vh;
-  left: 7vw;
-  width: min(22rem, 27vw);
-  min-width: 15rem;
-}
-
-.vien-narrative p {
-  margin: 0;
-  color: rgba(255, 255, 255, 0.78);
-  font-size: clamp(0.85rem, 1vw, 1rem);
-  line-height: 1.55;
-}
-
 /* Statistics — full size and readable (was scaled to 0.48, leaving ~7px labels) */
 
-.afib-statistics {
+.delivery-highlights {
   top: 50%;
   left: 50%;
   width: min(66rem, 90vw);
@@ -629,7 +613,7 @@ html.lenis body {
   transform: translate(-50%, -50%);
 }
 
-.afib-statistics::before {
+.delivery-highlights::before {
   position: absolute;
   z-index: -1;
   inset: -12% -6%;
@@ -637,7 +621,7 @@ html.lenis body {
   content: '';
 }
 
-.afib-statistics h2 {
+.delivery-highlights h2 {
   margin: 0 0 clamp(2rem, 5vh, 3.5rem);
   color: rgba(255, 255, 255, 0.94);
   font-size: clamp(1.6rem, 3vw, 3rem);
@@ -645,11 +629,11 @@ html.lenis body {
   letter-spacing: -0.04em;
 }
 
-.afib-statistics h2 strong {
+.delivery-highlights h2 strong {
   font-weight: 600;
 }
 
-.afib-statistics h2 sup {
+.delivery-highlights h2 sup {
   position: relative;
   top: -0.2em;
   margin-left: 0.08em;
@@ -793,11 +777,10 @@ html.lenis body {
 /* Tablet / phone: copy blocks anchor to the bottom, clear of the nav */
 
 @media (max-width: 800px) {
-  .medical-callout,
-  .clinical-callout,
+  .platform-callout,
+  .enterprise-callout,
   .final-callout,
-  .watch-narrative,
-  .vien-narrative {
+  .carro-narrative {
     top: auto;
     right: 1.25rem;
     bottom: calc(7rem + env(safe-area-inset-bottom, 0px));
@@ -806,25 +789,24 @@ html.lenis body {
     min-width: 0;
   }
 
-  .clinical-callout h2,
+  .enterprise-callout h2,
   .final-callout h2 {
     max-width: none;
     font-size: clamp(1.4rem, 6.4vw, 1.9rem);
   }
 
-  .clinical-callout p,
+  .enterprise-callout p,
   .final-callout p,
-  .watch-narrative p,
-  .vien-narrative p,
-  .medical-callout p {
+  .carro-narrative p,
+  .platform-callout p {
     font-size: 0.88rem;
   }
 
-  .clinical-callout p:nth-of-type(2) {
+  .enterprise-callout p:nth-of-type(2) {
     display: none;
   }
 
-  .watch-narrative h2 {
+  .carro-narrative h2 {
     font-size: clamp(1.4rem, 6.4vw, 1.9rem);
   }
 
@@ -847,7 +829,7 @@ html.lenis body {
     margin-bottom: 0.3rem;
   }
 
-  .afib-statistics h2 {
+  .delivery-highlights h2 {
     margin-bottom: 1.6rem;
   }
 }

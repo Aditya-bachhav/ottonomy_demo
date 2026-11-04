@@ -51,7 +51,7 @@ export function Loader({ forceDone, onDone }: { forceDone: boolean; onDone: () =
 
   return (
     <div className={`loader${ready ? ' is-done' : ''}`} role="status" aria-live="polite">
-      <span className="loader__name">StimCardio</span>
+      <span className="loader__name">Ottonomy</span>
       <div className="loader__bar" aria-hidden="true">
         <i style={{ transform: `scaleX(${value / 100})` }} />
       </div>

@@ -6,14 +6,13 @@ import Scene from './components/Scene'
 import { Loader, SceneBoundary } from './components/Chrome'
 import { Navbar, PostModelLayout, SiteFooter } from './components/Sections'
 import {
-  AfibStatistics,
   BrandMark,
-  ClinicalResearchCallout,
-  FinalCallout,
-  MedicalCallout,
+  DeliveryHighlights,
+  EnterpriseCallout,
+  OttonomyCallout,
+  ReliabilityCallout,
   ProgressChrome,
-  VienNarrative,
-  WatchNarrative,
+  CarroNarrative,
 } from './components/Overlays'
 
 export default function App() {
@@ -77,22 +76,21 @@ export default function App() {
       <Loader forceDone={sceneFailed} onDone={handleDone} />
       <Navbar />
       <ProgressChrome />
-      <section className="scroll-stage" ref={stageRef} aria-label="StimCardio product story">
+      <section className="scroll-stage" ref={stageRef} aria-label="Ottonomy autonomous delivery story">
         <div className="cinematic-layer" ref={layerRef}>
           <div className="scene">
             <SceneBoundary onError={handleError}>
               <Scene />
             </SceneBoundary>
           </div>
-          <div className="watch-content">
+          <div className="model-content">
             <BrandMark />
-            <MedicalCallout />
-            <AfibStatistics />
-            <ClinicalResearchCallout />
-            <FinalCallout />
-            <WatchNarrative />
+            <OttonomyCallout />
+            <DeliveryHighlights />
+            <EnterpriseCallout />
+            <ReliabilityCallout />
+            <CarroNarrative />
           </div>
-          <VienNarrative />
           <div className="grain-overlay" aria-hidden="true" />
         </div>
       </section>
