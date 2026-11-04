@@ -18,7 +18,7 @@ export class SceneBoundary extends Component<{ children: ReactNode; onError: () 
 }
 
 export function Loader({ forceDone, onDone }: { forceDone: boolean; onDone: () => void }) {
-  const { progress, active } = useProgress()
+  const { progress } = useProgress()
   const [hidden, setHidden] = useState(false)
   const [ready, setReady] = useState(false)
 
@@ -27,15 +27,12 @@ export function Loader({ forceDone, onDone }: { forceDone: boolean; onDone: () =
       setReady(true)
       return
     }
-    if (!active && progress >= 100) {
-      const timer = window.setTimeout(() => setReady(true), 650)
-      return () => window.clearTimeout(timer)
-    }
-  }, [active, progress, forceDone])
+    if (progress >= 100) setReady(true)
+  }, [progress, forceDone])
 
   // Never trap the visitor behind the loader on a slow or failing connection.
   useEffect(() => {
-    const timer = window.setTimeout(() => setReady(true), 15000)
+    const timer = window.setTimeout(() => setReady(true), 2200)
     return () => window.clearTimeout(timer)
   }, [])
 
@@ -47,7 +44,7 @@ export function Loader({ forceDone, onDone }: { forceDone: boolean; onDone: () =
   }, [ready, onDone])
 
   if (hidden) return null
-  const value = Math.round(forceDone ? 100 : progress)
+  const value = Math.round(forceDone ? 100 : Math.min(progress, 92))
 
   return (
     <div className={`loader${ready ? ' is-done' : ''}`} role="status" aria-live="polite">
@@ -55,7 +52,7 @@ export function Loader({ forceDone, onDone }: { forceDone: boolean; onDone: () =
       <div className="loader__bar" aria-hidden="true">
         <i style={{ transform: `scaleX(${value / 100})` }} />
       </div>
-      <span className="loader__count">{ready ? 'Ready' : `Loading ${String(value).padStart(2, '0')}%`}</span>
+      <span className="loader__count">{ready ? 'Ready' : `Preparing route ${String(value).padStart(2, '0')}%`}</span>
     </div>
   )
 }

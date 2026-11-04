@@ -15,4 +15,4 @@ Structure
 - `src/components/Overlays.tsx` — scroll-driven copy, wordmark, progress
 - `src/components/Sections.tsx` — navbar, about grid, footer
 - `src/data/*.json` — camera/keyframe data exported from your editor
-- `public/model/carro.glb` — the optimized carro model (Draco-compressed geometry and WebP textures)
+- `public/model/carro.glb` — the optimized carro model (Draco-compressed geometry and 1024px WebP textures)
